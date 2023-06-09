@@ -227,7 +227,10 @@ impl WsServerTask {
                             log::warn!("Unsubscribing from non-existent subscription with id {:?}", id);
                         }
                     }
-                    None => {}
+                    None => {
+                        log::info!("Client dropped");
+                        break;
+                    }
                 },
                 res = receiver.next() => match res {
                     Some(Ok(data)) => {
@@ -237,11 +240,18 @@ impl WsServerTask {
                         log::error!("WS connection error: {:?}", e);
                         break;
                     },
-                    None => break,
+                    None => {
+                        log::info!("WebSocket receiver ended");
+                        break;
+                    }
                 },
-                complete => break,
+                complete => {
+                    log::info!("Driver loop complete");
+                    break;
+                }
             }
         }
+        log::info!("Driver loop ended");
     }
 }
 
